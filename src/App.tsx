@@ -366,8 +366,12 @@ function App() {
   const [levelIndex, setLevelIndex] = useState(0);
   const currentLevel = activeLevels[levelIndex];
   const [solution, setSolution] = useState<string>("");
-  const [guesses, setGuesses] = useState<string[]>(Array(30).fill(""));
-  const [statuses, setStatuses] = useState<Status[]>(Array(30).fill(""));
+  const [guesses, setGuesses] = useState<string[]>(() =>
+    Array(activeLevels[0].baseRows * activeLevels[0].wordLength).fill(""),
+  );
+  const [statuses, setStatuses] = useState<Status[]>(() =>
+    Array(activeLevels[0].baseRows * activeLevels[0].wordLength).fill(""),
+  );
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [animatingRow, setAnimatingRow] = useState<number | null>(null);
@@ -729,7 +733,7 @@ function App() {
     }
 
     const nextIdx = levelIndex + 1;
-    const nextLevel = LEVELS[nextIdx];
+    const nextLevel = activeLevels[nextIdx];
     const updatedInventory = {
       HINT: newPowerUp === "HINT" ? inventory.HINT + 1 : inventory.HINT,
       TRIES: newPowerUp === "TRIES" ? inventory.TRIES + 1 : inventory.TRIES,
