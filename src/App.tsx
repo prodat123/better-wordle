@@ -342,12 +342,21 @@ const COUNTRIES = [
 ];
 
 const shuffleLevels = <T,>(levels: T[]): T[] => {
-  const shuffled = [...levels];
-  for (let i = shuffled.length - 1; i > 0; i--) {
+  if (levels.length === 0) return [];
+
+  const firstLevel = levels[0];
+
+  const remainingLevels = [...levels.slice(1)];
+
+  for (let i = remainingLevels.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    [remainingLevels[i], remainingLevels[j]] = [
+      remainingLevels[j],
+      remainingLevels[i],
+    ];
   }
-  return shuffled;
+
+  return [firstLevel, ...remainingLevels];
 };
 
 function App() {
