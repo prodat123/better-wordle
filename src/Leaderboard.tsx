@@ -17,17 +17,17 @@ interface Props {
 export default function Leaderboard({ currentUser, currentScore }: Props) {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [userRank, setUserRank] = useState<number | null>(null);
-  const [filter, setFilter] = useState({
-    country: "ALL",
-    sortBy: "score",
-  });
+  //   const [filter, setFilter] = useState({
+  //     country: "ALL",
+  //     sortBy: "score",
+  //   });
 
   useEffect(() => {
     fetchLeaderboard();
     if (currentScore !== undefined) {
       fetchUserRank();
     }
-  }, [filter, currentScore]);
+  }, [currentScore]);
 
   const fetchLeaderboard = async () => {
     let query = supabase
@@ -35,9 +35,9 @@ export default function Leaderboard({ currentUser, currentScore }: Props) {
       .select("name, score, country, created_at")
       .limit(10);
 
-    if (filter.country !== "ALL") query = query.eq("country", filter.country);
+    // if (filter.country !== "ALL") query = query.eq("country", filter.country);
 
-    query = query.order(filter.sortBy === "score" ? "score" : "created_at", {
+    query = query.order("score", {
       ascending: false,
     });
 
@@ -49,7 +49,7 @@ export default function Leaderboard({ currentUser, currentScore }: Props) {
     // Call the RPC function we created in SQL
     const { data, error } = await supabase.rpc("get_user_rank", {
       p_score: currentScore,
-      p_country: filter.country,
+      p_country: "ALL", // Default to all countries
     });
 
     if (!error) setUserRank(data);
