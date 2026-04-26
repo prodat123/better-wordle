@@ -121,11 +121,9 @@ export default function Leaderboard({ currentUser, currentScore }: Props) {
 }
 
 function getFlag(code: string) {
-  const flags: Record<string, string> = {
-    US: "🇺🇸",
-    GB: "🇬🇧",
-    CA: "🇨🇦",
-    UN: "🏳️",
-  };
-  return flags[code] || "🏳️";
+  if (code === "UN") return "🏳️";
+
+  return code
+    .toUpperCase()
+    .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397));
 }
