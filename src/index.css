@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@keyframes sweep {
+  0% {
+    transform: scale(1);
+    background-color: transparent;
+  }
+
+  50% {
+    transform: scale(1.1);
+    background-color: rgba(34, 197, 94, 0.2);
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: transparent;
+  }
+}
+
+.animate-sweep {
+  animation: sweep 0.4s ease-in-out;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+
+.animate-float-score {
+  animation: floatUp 1s forwards;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+    border-color: #3f3f46;
+  }
+
+  50% {
+    transform: scale(1.15);
+    border-color: #71717a;
+  }
+
+  100% {
+    transform: scale(1);
+    border-color: #52525b;
+  }
+}
+
+.animate-pop {
+  animation: pop 0.1s ease-out forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.animate-toast {
+  animation: fadeInOut 1.5s ease-in-out forwards;
+}
+
+@keyframes flip {
+  0% {
+    transform: rotateX(0);
+  }
+
+  45% {
+    transform: rotateX(90deg);
+  }
+
+  55% {
+    transform: rotateX(90deg);
+  }
+
+  100% {
+    transform: rotateX(0);
+  }
+}
+
+.animate-flip {
+  /* Keep backface-visibility hidden to prevent flickering */
+  backface-visibility: hidden;
+  animation: flip 0.9s ease-in-out forwards;
+}
+
+/* 0.45s is exactly half of 0.9s. 
+   This ensures the color "snaps" while the tile is vertical.
+*/
+.reveal-color {
+  transition:
+    background-color 0s linear 0.45s,
+    border-color 0s linear 0.45s,
+    color 0s linear 0.45s;
+}
