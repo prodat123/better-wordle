@@ -807,14 +807,14 @@ function App() {
         </div>
       )}
 
-      <div className="flex flex-col items-center my-4 text-md font-bold uppercase text-gray-400">
+      <header className="flex flex-col items-center shrink-0 pt-2">
         <img
           src={logo}
-          className="w-28 h-28"
+          className="w-12 h-12 md:w-16 md:h-16 mb-1"
           style={{ imageRendering: "pixelated" }}
         />
 
-        <div className="text-center mb-4">
+        <div className="text-center mb-1">
           <span className="uppercase font-semibold dark:text-gray-400">
             Round {levelIndex + 1} / 8
           </span>
@@ -852,7 +852,7 @@ function App() {
             +{inventory.SCHOLAR}
           </span>
         )}
-      </div>
+      </header>
 
       {inventory.DEFINITION && !gameOver && (
         <div className="max-w-sm mx-auto mb-4 p-3 bg-green-100 dark:bg-green-900/20 border border-green-200 text-sm italic dark:text-green-200 font-sans">
@@ -860,9 +860,9 @@ function App() {
         </div>
       )}
 
-      <main className="flex-grow flex items-center justify-center w-full max-w-sm overflow-hidden">
+      <main className="flex-1 w-full flex items-center justify-center min-h-0 overflow-hidden py-2">
         <div
-          className="grid gap-1 w-full max-w-sm mx-auto px-4"
+          className="grid gap-1 w-full max-w-xs sm:max-w-sm mx-auto px-4"
           style={{
             gridTemplateColumns: `repeat(${currentLevel.wordLength}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${totalRows}, minmax(0, 1fr))`,
