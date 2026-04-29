@@ -1,14 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBook,
-  faMagnifyingGlass,
-  faPlus,
-  faBolt,
-  faLightbulb,
-  faGraduationCap,
-  faRotateLeft,
-} from "@fortawesome/free-solid-svg-icons";
+import { faRotateLeft } from "@fortawesome/free-solid-svg-icons";
 
 import hintImg from "./assets/hint_letter_sprite.png";
 import triesImg from "./assets/more_tries_sprite.png";
