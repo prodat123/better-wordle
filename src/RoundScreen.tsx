@@ -10,6 +10,13 @@ import {
   faRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 
+import hintImg from "./assets/hint_letter_sprite.png";
+import triesImg from "./assets/more_tries_sprite.png";
+// import defImg from "./assets/definition_icon.png";
+import multImg from "./assets/two_times_sprite.png";
+// import yellowImg from "./assets/flashback_icon.png";
+// import scholarImg from "./assets/scholar_icon.png";
+
 export type PowerUpType =
   | "HINT"
   | "TRIES"
@@ -41,42 +48,42 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
       id: "HINT" as const,
       label: "Hint Letter",
       desc: "Reveal a correct letter at start",
-      icon: faMagnifyingGlass,
+      icon: hintImg,
       color: "text-blue-500",
     },
     {
       id: "TRIES" as const,
       label: "More Tries",
       desc: "+1 extra row next round",
-      icon: faPlus,
+      icon: triesImg,
       color: "text-green-500",
     },
     {
       id: "DEFINITION" as const,
       label: "Definition",
       desc: "Show word definition",
-      icon: faBook,
+      icon: hintImg,
       color: "text-purple-500",
     },
     {
       id: "MULTIPLIER" as const,
       label: "Double Time",
       desc: "2x points for remaining rounds",
-      icon: faBolt,
+      icon: multImg,
       color: "text-yellow-500",
     },
     {
       id: "REVEAL_YELLOW" as const,
       label: "Flashback",
       desc: "Instantly reveal 1 yellow letter",
-      icon: faLightbulb,
+      icon: hintImg,
       color: "text-orange-500",
     },
     {
       id: "SCHOLAR" as const,
       label: "Scholar",
       desc: "Permanent +50 points per win",
-      icon: faGraduationCap,
+      icon: hintImg,
       color: "text-indigo-500",
     },
   ];
@@ -115,7 +122,7 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
             </p>
           </div>
 
-          {isWin ? (
+          {isWin && (
             <div className="text-left mb-6">
               <p className="text-xs font-bold text-gray-500 text-center uppercase mb-3 tracking-widest">
                 Choose your Advantage
@@ -134,7 +141,7 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
                     <div
                       className={`text-2xl mr-4 w-10 h-10 flex items-center justify-center rounded-lg ${p.color} bg-white dark:bg-gray-800 shadow-sm`}
                     >
-                      <FontAwesomeIcon icon={p.icon} />
+                      <img src={p.icon} />
                     </div>
                     <div className="text-left">
                       <p className="font-bold dark:text-white text-sm">
@@ -147,16 +154,6 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
                   </button>
                 ))}
               </div>
-            </div>
-          ) : (
-            <div className="mb-8 p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-900/50">
-              <p className="text-red-600 dark:text-red-400 font-medium italic text-sm">
-                "Failure is simply the opportunity to begin again, this time
-                more intelligently."
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                — Your score and perks have been reset.
-              </p>
             </div>
           )}
 
