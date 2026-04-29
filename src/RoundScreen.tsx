@@ -1,20 +1,21 @@
 import React, { useState, useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { motion, AnimatePresence } from "framer-motion";
 
 import hintImg from "./assets/hint_letter_sprite.png";
 import triesImg from "./assets/more_tries_sprite.png";
-// import defImg from "./assets/definition_icon.png";
+import defImg from "./assets/definition_sprite.png";
 import multImg from "./assets/two_times_sprite.png";
-// import yellowImg from "./assets/flashback_icon.png";
-// import scholarImg from "./assets/scholar_icon.png";
+import flashbackImg from "./assets/flashback_sprite.png";
+import scholarImg from "./assets/scholar_sprite.png";
 
 export type PowerUpType =
   | "HINT"
   | "TRIES"
   | "DEFINITION"
   | "MULTIPLIER"
-  | "REVEAL_YELLOW"
+  | "REVEAL_GREEN"
   | "SCHOLAR"
   | null;
 
@@ -54,28 +55,28 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
       id: "DEFINITION" as const,
       label: "Definition",
       desc: "Show word definition",
-      icon: hintImg,
+      icon: defImg,
       color: "text-purple-500",
     },
     {
       id: "MULTIPLIER" as const,
-      label: "Double Time",
+      label: "Double Points",
       desc: "2x points for remaining rounds",
       icon: multImg,
       color: "text-yellow-500",
     },
     {
-      id: "REVEAL_YELLOW" as const,
+      id: "REVEAL_GREEN" as const,
       label: "Flashback",
-      desc: "Instantly reveal 1 yellow letter",
-      icon: hintImg,
+      desc: "Instantly reveal 1 green letter",
+      icon: flashbackImg,
       color: "text-orange-500",
     },
     {
       id: "SCHOLAR" as const,
       label: "Scholar",
       desc: "Permanent +50 points per win",
-      icon: hintImg,
+      icon: scholarImg,
       color: "text-indigo-500",
     },
   ];
@@ -87,9 +88,26 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
   }, [isWin]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-      <div
-        className={`bg-white dark:bg-gray-800 w-full max-w-md rounded-2xl shadow-2xl p-6 border-2 ${isWin ? "border-green-500/50" : "border-red-500/50"}`}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+    >
+      <motion.div
+        /* Pop animation: Starts small and slightly below, then springs up */
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{
+          scale: 1,
+          opacity: 1,
+          y: 0,
+          transition: {
+            type: "spring",
+            damping: 15,
+            stiffness: 300,
+          },
+        }}
+        className={`bg-white dark:bg-gray-800 w-full max-w-md shadow-2xl p-6 border-2 
+        ${isWin ? "border-green-500/50" : "border-red-500/50"}`}
       >
         <div className="text-center">
           <h2
@@ -105,7 +123,7 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
             </span>
           </p>
 
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 mb-6">
+          <div className="bg-gray-50 dark:bg-gray-900/50 p-4 mb-6">
             <p className="text-4xl font-black text-green-500">
               +{isWin ? scoreAddition : 0} <span className="text-sm">PTS</span>
             </p>
@@ -120,20 +138,33 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
                 Choose your Advantage
               </p>
               <div className="grid gap-3">
-                {displayedPowerUps.map((p) => (
-                  <button
+                {displayedPowerUps.map((p, idx) => (
+                  <motion.button
                     key={p.id}
+                    /* Stagger the entrance of each power-up button */
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{
+                      opacity: 1,
+                      x: 0,
+                      transition: { delay: 0.2 + idx * 0.1 },
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedPowerUp(p.id)}
-                    className={`flex items-center p-3 rounded-xl border-2 transition-all duration-200 ${
+                    className={`cursor-pointer flex items-center p-3 border-2 transition-colors duration-200 ${
                       selectedPowerUp === p.id
-                        ? "border-green-500 bg-green-50 dark:bg-green-900/30 scale-[1.02]"
-                        : "border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-gray-50/50 dark:bg-gray-900/20"
+                        ? "border-green-500 bg-green-50 dark:bg-green-900/30"
+                        : "border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20"
                     }`}
                   >
                     <div
-                      className={`text-2xl mr-4 w-10 h-10 flex items-center justify-center rounded-lg ${p.color} bg-white dark:bg-gray-800 shadow-sm`}
+                      className={`text-2xl mr-4 w-10 h-10 flex items-center justify-center ${p.color} bg-white dark:bg-gray-800 shadow-sm`}
                     >
-                      <img src={p.icon} />
+                      <img
+                        src={p.icon}
+                        style={{ imageRendering: "pixelated" }}
+                        alt=""
+                      />
                     </div>
                     <div className="text-left">
                       <p className="font-bold dark:text-white text-sm">
@@ -143,37 +174,38 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
                         {p.desc}
                       </p>
                     </div>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
           )}
 
-          <button
+          <motion.button
+            whileHover={selectedPowerUp || !isWin ? { scale: 1.02 } : {}}
+            whileTap={selectedPowerUp || !isWin ? { scale: 0.95 } : {}}
             onClick={() => onNextRound(selectedPowerUp)}
             disabled={isWin && !selectedPowerUp}
-            className={`w-full font-bold py-4 rounded-xl text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${
+            className={`w-full font-bold py-4 text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${
               !isWin
                 ? "bg-red-600 hover:bg-red-700 text-white"
                 : selectedPowerUp
-                  ? "bg-green-600 hover:bg-green-700 text-white translate-y-0"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed translate-y-1 shadow-none"
+                  ? "bg-green-600 hover:bg-green-700 text-white"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
             {!isWin ? (
               <>
-                <FontAwesomeIcon icon={faRotateLeft} />
-                RESTART FROM ROUND 1
+                <FontAwesomeIcon icon={faRotateLeft} /> RESTART FROM ROUND 1
               </>
             ) : selectedPowerUp ? (
               "COLLECT & START NEXT ROUND"
             ) : (
               "SELECT A POWER-UP"
             )}
-          </button>
+          </motion.button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

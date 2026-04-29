@@ -11,6 +11,15 @@ body{
   text-rendering: optimizeSpeed;
 
   font-style: normal;
+
+  overflow-y: hidden;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+img {
+  image-rendering: pixelated;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 @keyframes sweep {
@@ -37,21 +46,30 @@ body{
 @keyframes floatUp {
   0% {
     opacity: 0;
-    transform: translateY(0);
+    transform: translateY(0) scale(0.5);
   }
 
-  50% {
+  20% {
     opacity: 1;
+    transform: translateY(-20px) scale(1.2);
+    /* Pop up quickly */
+  }
+
+  80% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1);
+    /* Drift slowly while staying visible */
   }
 
   100% {
     opacity: 0;
-    transform: translateY(-40px);
+    transform: translateY(-60px) scale(0.8);
+    /* Fade out at the very end */
   }
 }
 
 .animate-float-score {
-  animation: floatUp 1s forwards;
+  animation: floatUp 2.5s ease-out forwards;
 }
 
 @keyframes pop {

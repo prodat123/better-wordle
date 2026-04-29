@@ -10,6 +10,9 @@ import {
   faQuestion,
   faTableCells,
 } from "@fortawesome/free-solid-svg-icons";
+
+import logo from "./assets/logo.png";
+
 import { supabase } from "./supabase";
 import Leaderboard from "./Leaderboard";
 
@@ -373,6 +376,8 @@ function App() {
   const [statuses, setStatuses] = useState<Status[]>(() =>
     Array(activeLevels[0].baseRows * activeLevels[0].wordLength).fill(""),
   );
+  const [givingPoints, setGivingPoints] = useState<number[]>([]);
+
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [animatingRow, setAnimatingRow] = useState<number | null>(null);
@@ -495,7 +500,7 @@ function App() {
         setCurrentIdx(revealed);
       }
 
-      if (justAdded === "REVEAL_YELLOW") {
+      if (justAdded === "REVEAL_GREEN") {
         setTimeout(() => {
           const minIndex = inv.HINT;
           const maxIndex = level.wordLength - 1;
@@ -504,7 +509,7 @@ function App() {
               Math.floor(Math.random() * (maxIndex - minIndex + 1)) + minIndex;
             setStatuses((prev) => {
               const next = [...prev];
-              next[randomIndex] = "bg-yellow-500 border-yellow-500 text-white";
+              next[randomIndex] = "bg-green-600 border-green-600 text-white";
               return next;
             });
             setGuesses((prev) => {
@@ -580,28 +585,37 @@ function App() {
     if (currentGuess === solution) {
       const currentRow = Math.floor(currentIdx / len) - 1;
       const remainingTries = totalRows - (currentRow + 1);
-
       const pointsPerRow = (100 + inventory.SCHOLAR) * inventory.MULTIPLIER;
       const addedPoints = remainingTries * pointsPerRow;
 
-      const isLastRound = levelIndex === LEVELS.length - 1;
+      // 1. Wait for the initial winning row to finish flipping
+      // (wordLength * 400ms stagger + 500ms for the flip animation itself)
+      await new Promise((res) => setTimeout(res, len * 400 + 500));
 
+      // 2. Cascade through remaining rows
       for (let r = currentRow + 1; r < totalRows; r++) {
-        await new Promise((res) => setTimeout(res, 400));
-        setAnimatingRow(r);
+        // Highlight the row and show the score
+        setGivingPoints((prev) => [...prev, r]);
         setShowFloatScore(r);
-        setTimeout(() => setShowFloatScore(null), 1000);
+
+        // Play a sound effect here if you have one!
+
+        // Briefly show the score then clear it
+        setTimeout(() => setShowFloatScore(null), 2500);
+
+        // Stagger between each point-giving row
+        await new Promise((res) => setTimeout(res, 400));
       }
 
       setScoreAddition(addedPoints);
       setScore((prev) => prev + addedPoints);
       setIsWin(true);
 
+      const isLastRound = levelIndex === activeLevels.length - 1;
       if (isLastRound) {
         setIsCampaignFinished(true);
-        setGameOver(false);
       } else {
-        setTimeout(() => setGameOver(true), 800);
+        setTimeout(() => setGameOver(true), 1200);
       }
     } else if (currentIdx === totalRows * len) {
       setIsWin(false);
@@ -645,17 +659,25 @@ function App() {
 
           try {
             const res = await fetch(
-              `https://api.dictionaryapi.dev/api/v2/entries/en/${wordAttempt}`,
+              `https://api.datamuse.com/words?sp=${wordAttempt}&max=1`,
             );
-            if (!res.ok) {
+            const data = await res.json();
+
+            // Datamuse returns an empty array [] if the word isn't found
+            // We also verify the first result matches exactly to be safe
+            const isValid =
+              data.length > 0 && data[0].word.toLowerCase() === wordAttempt;
+
+            if (!isValid) {
               setShakeRow(Math.floor((currentIdx - 1) / len));
-              setToast("Not in word list"); // Trigger Toast
+              setToast("Not in word list");
               setTimeout(() => {
                 setShakeRow(null);
                 setToast(null);
               }, 1500);
               return;
             }
+
             checkGuess();
           } catch (err) {
             checkGuess(); // API fallback
@@ -716,6 +738,8 @@ function App() {
   }, [onKeyPress]);
 
   const resetGame = (newPowerUp: PowerUpType) => {
+    setGivingPoints([]);
+
     if (!isWin) {
       const initialInventory = {
         HINT: 0,
@@ -783,6 +807,15 @@ function App() {
         </div>
       )}
 
+      <img
+        src={logo}
+        className="w-28 h-28"
+        style={{ imageRendering: "pixelated" }}
+      />
+      <h1 className="text-4xl font-bold text-center mb-2 text-gray-800 dark:text-white">
+        Wordle Rogue
+      </h1>
+
       <div className="text-center mb-4">
         <span className="uppercase font-semibold dark:text-gray-400">
           Round {levelIndex + 1} / 8
@@ -825,7 +858,7 @@ function App() {
       </div>
 
       {inventory.DEFINITION && !gameOver && (
-        <div className="max-w-sm mx-auto mb-4 p-3 bg-purple-100 dark:bg-purple-900/20 border border-purple-200 text-xs italic dark:text-purple-200">
+        <div className="max-w-sm mx-auto mb-4 p-3 bg-green-100 dark:bg-green-900/20 border border-green-200 text-sm italic dark:text-green-200 font-sans">
           <strong>Definition:</strong> {definition.replace(/^.\t/, "")}
         </div>
       )}
@@ -842,47 +875,43 @@ function App() {
           const colIdx = i % currentLevel.wordLength;
           const isPop = i === lastTypedIdx;
           const isShake = rowIdx === shakeRow;
-
-          // Identify if this row is being submitted (revealed)
-          // You'll need to set 'animatingRow' to the current row index in checkGuess()
           const isRevealing = animatingRow === rowIdx;
 
-          const hasLetter = char && char !== "";
-
-          const hasStatus = !!statuses[i];
+          // NEW: Check if this row is currently receiving points
+          const isPointRow = givingPoints.includes(rowIdx);
 
           return (
             <div
               key={i}
               style={{
-                // Increased stagger from 150ms to 250ms for a more deliberate "wave"
                 animationDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
                 transitionDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
               }}
-              className={`relative h-16 border-2 flex items-center justify-center font-bold text-4xl uppercase
-                ${isPop ? "animate-pop" : ""}
-                ${isShake ? "animate-shake" : ""}
-                ${isRevealing ? "animate-flip reveal-color" : ""}
-                ${
-                  hasStatus
-                    ? statuses[i] // If it's green/yellow, use that
-                    : hasLetter
-                      ? "border-black dark:border-white dark:text-white" // If filled but not submitted
-                      : "border-gray-300 dark:border-gray-600 dark:text-white" // If empty
-                }
-              `}
+              className={`relative h-16 border-2 flex items-center justify-center font-bold text-4xl uppercase transition-all duration-500
+        ${isPop ? "animate-pop" : ""}
+        ${isShake ? "animate-shake" : ""}
+        ${isRevealing ? "animate-flip reveal-color" : ""}
+        
+        /* Highlight row green if giving points, otherwise normal logic */
+        ${
+          isPointRow
+            ? "bg-green-500/20 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+            : statuses[i] ||
+              (char
+                ? "border-black dark:border-white"
+                : "border-gray-300 dark:border-gray-600")
+        }
+      `}
             >
               {char}
 
               {showFloatScore === rowIdx &&
                 colIdx === Math.floor(currentLevel.wordLength / 2) && (
-                  <div
-                    className="absolute inset-0 flex items-center justify-center pointer-events-none z-10"
-                    style={{
-                      transitionDelay: `${currentLevel.wordLength * 150}ms`,
-                    }}
-                  >
-                    <span className="text-green-600 font-black text-2xl animate-float-score">
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                    <span
+                      className="text-green-500 font-black text-3xl animate-float-score drop-shadow-md"
+                      style={{ WebkitTextStroke: "1px rgba(0,0,0,0.2)" }}
+                    >
                       +{(100 + inventory.SCHOLAR) * (inventory.MULTIPLIER || 1)}
                     </span>
                   </div>
@@ -968,7 +997,7 @@ function App() {
                 key={key}
                 onClick={() => onKeyPress(key)}
                 className={`h-14 font-bold transition-all flex items-center justify-center text-white
-                ${key.length > 1 ? "px-4 text-xs bg-gray-500" : "flex-1 max-w-[40px] text-sm"}
+                ${key.length > 1 ? "px-4 text-xs bg-gray-500" : "flex-1 max-w-[40px] text-md"}
                 ${keyStatuses[key] || "bg-gray-400 hover:bg-gray-500"}`}
               >
                 {key == "DEL" ? (
