@@ -800,31 +800,28 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-6 flex flex-col justify-center items-center">
+    <div className="h-[100dvh] w-full bg-white dark:bg-gray-900 flex flex-col items-center overflow-hidden p-2">
       {toast && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] bg-gray-800 text-white px-4 py-2 font-bold shadow-xl animate-toast">
           {toast}
         </div>
       )}
 
-      <img
-        src={logo}
-        className="w-28 h-28"
-        style={{ imageRendering: "pixelated" }}
-      />
-      <h1 className="text-4xl font-bold text-center mb-2 text-gray-800 dark:text-white">
-        Wordle Rogue
-      </h1>
+      <div className="flex flex-col items-center my-4 text-md font-bold uppercase text-gray-400">
+        <img
+          src={logo}
+          className="w-28 h-28"
+          style={{ imageRendering: "pixelated" }}
+        />
 
-      <div className="text-center mb-4">
-        <span className="uppercase font-semibold dark:text-gray-400">
-          Round {levelIndex + 1} / 8
-        </span>
-      </div>
+        <div className="text-center mb-4">
+          <span className="uppercase font-semibold dark:text-gray-400">
+            Round {levelIndex + 1} / 8
+          </span>
+        </div>
 
-      <h3 className="text-xl font-bold dark:text-white">Score: {score}</h3>
+        <h3 className="text-xl font-bold dark:text-white">Score: {score}</h3>
 
-      <div className="flex gap-4 my-4 text-md font-bold uppercase text-gray-400">
         {inventory.HINT > 0 && (
           <span>
             <FontAwesomeIcon className="text-blue-500" icon={faQuestion} />{" "}
@@ -863,31 +860,32 @@ function App() {
         </div>
       )}
 
-      <div
-        className="grid gap-1 w-full max-w-sm mx-auto px-4"
-        style={{
-          gridTemplateColumns: `repeat(${currentLevel.wordLength}, minmax(0, 1fr))`,
-          gridTemplateRows: `repeat(${totalRows}, minmax(0, 1fr))`,
-        }}
-      >
-        {guesses.map((char, i) => {
-          const rowIdx = Math.floor(i / currentLevel.wordLength);
-          const colIdx = i % currentLevel.wordLength;
-          const isPop = i === lastTypedIdx;
-          const isShake = rowIdx === shakeRow;
-          const isRevealing = animatingRow === rowIdx;
+      <main className="flex-grow flex items-center justify-center w-full max-w-sm overflow-hidden">
+        <div
+          className="grid gap-1 w-full max-w-sm mx-auto px-4"
+          style={{
+            gridTemplateColumns: `repeat(${currentLevel.wordLength}, minmax(0, 1fr))`,
+            gridTemplateRows: `repeat(${totalRows}, minmax(0, 1fr))`,
+          }}
+        >
+          {guesses.map((char, i) => {
+            const rowIdx = Math.floor(i / currentLevel.wordLength);
+            const colIdx = i % currentLevel.wordLength;
+            const isPop = i === lastTypedIdx;
+            const isShake = rowIdx === shakeRow;
+            const isRevealing = animatingRow === rowIdx;
 
-          // NEW: Check if this row is currently receiving points
-          const isPointRow = givingPoints.includes(rowIdx);
+            // NEW: Check if this row is currently receiving points
+            const isPointRow = givingPoints.includes(rowIdx);
 
-          return (
-            <div
-              key={i}
-              style={{
-                animationDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
-                transitionDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
-              }}
-              className={`relative h-16 border-2 flex items-center justify-center font-bold text-4xl uppercase transition-all duration-500
+            return (
+              <div
+                key={i}
+                style={{
+                  animationDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
+                  transitionDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
+                }}
+                className={`relative aspect-square border-2 flex items-center justify-center font-bold text-2xl sm:text-4xl uppercase 
         ${isPop ? "animate-pop" : ""}
         ${isShake ? "animate-shake" : ""}
         ${isRevealing ? "animate-flip reveal-color" : ""}
@@ -902,114 +900,119 @@ function App() {
                 : "border-gray-300 dark:border-gray-600")
         }
       `}
-            >
-              {char}
-
-              {showFloatScore === rowIdx &&
-                colIdx === Math.floor(currentLevel.wordLength / 2) && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                    <span
-                      className="text-green-500 font-black text-3xl animate-float-score drop-shadow-md"
-                      style={{ WebkitTextStroke: "1px rgba(0,0,0,0.2)" }}
-                    >
-                      +{(100 + inventory.SCHOLAR) * (inventory.MULTIPLIER || 1)}
-                    </span>
-                  </div>
-                )}
-            </div>
-          );
-        })}
-      </div>
-
-      {gameOver && !isCampaignFinished && (
-        <RoundScreen
-          isWin={isWin}
-          solution={solution}
-          score={score}
-          scoreAddition={scoreAddition}
-          onNextRound={resetGame}
-        />
-      )}
-
-      {isCampaignFinished && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-800 p-8 max-w-sm w-full text-center shadow-2xl border-4 border-yellow-500">
-            <Leaderboard currentUser={userName} currentScore={score} />
-
-            <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Enter your name"
-                className="w-full p-3 border-2 border-gray-500 dark:bg-gray-700 dark:text-white"
-                value={userName}
-                onChange={(e) =>
-                  setUserName(e.target.value.toUpperCase().slice(0, 10))
-                }
-              />
-              <input
-                type="password"
-                placeholder="Enter Password (to save or overwrite)"
-                className="w-full p-3 border-2 border-gray-500 dark:bg-gray-700 dark:text-white"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-
-              <select
-                className="w-full p-3 border-2 border-gray-500 dark:bg-gray-700 dark:text-white cursor-pointer"
-                value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
               >
-                {COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                {char}
 
-              <button
-                onClick={saveHighScore}
-                disabled={isSaving}
-                className="w-full bg-green-600 hover:bg-green-600 text-white font-bold py-4 transition-all"
-              >
-                {isSaving ? "SAVING..." : "SAVE SCORE & RESTART"}
-              </button>
+                {showFloatScore === rowIdx &&
+                  colIdx === Math.floor(currentLevel.wordLength / 2) && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                      <span
+                        className="text-green-500 font-black text-3xl animate-float-score drop-shadow-md"
+                        style={{ WebkitTextStroke: "1px rgba(0,0,0,0.2)" }}
+                      >
+                        +
+                        {(100 + inventory.SCHOLAR) *
+                          (inventory.MULTIPLIER || 1)}
+                      </span>
+                    </div>
+                  )}
+              </div>
+            );
+          })}
+        </div>
 
-              <button
-                onClick={() => window.location.reload()}
-                className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 transition-all"
-              >
-                DISCARD
-              </button>
+        {gameOver && !isCampaignFinished && (
+          <RoundScreen
+            isWin={isWin}
+            solution={solution}
+            score={score}
+            scoreAddition={scoreAddition}
+            onNextRound={resetGame}
+          />
+        )}
+
+        {isCampaignFinished && (
+          <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
+            <div className="bg-white dark:bg-gray-800 p-8 max-w-sm w-full text-center shadow-2xl border-4 border-yellow-500">
+              <Leaderboard currentUser={userName} currentScore={score} />
+
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  className="w-full p-3 border-2 border-gray-500 dark:bg-gray-700 dark:text-white"
+                  value={userName}
+                  onChange={(e) =>
+                    setUserName(e.target.value.toUpperCase().slice(0, 10))
+                  }
+                />
+                <input
+                  type="password"
+                  placeholder="Enter Password (to save or overwrite)"
+                  className="w-full p-3 border-2 border-gray-500 dark:bg-gray-700 dark:text-white"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+
+                <select
+                  className="w-full p-3 border-2 border-gray-500 dark:bg-gray-700 dark:text-white cursor-pointer"
+                  value={selectedCountry}
+                  onChange={(e) => setSelectedCountry(e.target.value)}
+                >
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  onClick={saveHighScore}
+                  disabled={isSaving}
+                  className="w-full bg-green-600 hover:bg-green-600 text-white font-bold py-4 transition-all"
+                >
+                  {isSaving ? "SAVING..." : "SAVE SCORE & RESTART"}
+                </button>
+
+                <button
+                  onClick={() => window.location.reload()}
+                  className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 transition-all"
+                >
+                  DISCARD
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
 
-      <div className="max-w-xl w-full mx-auto mt-10 px-2">
-        {[
-          ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-          ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
-          ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "DEL"],
-        ].map((row, rIdx) => (
-          <div key={rIdx} className="flex justify-center mb-2 gap-1">
-            {row.map((key) => (
-              <button
-                key={key}
-                onClick={() => onKeyPress(key)}
-                className={`h-14 font-bold transition-all flex items-center justify-center text-white
+      <footer className="w-full max-w-xl shrink-0 pb-4">
+        <div className="max-w-xl w-full mx-auto mt-10 px-2">
+          {[
+            ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+            ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+            ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "DEL"],
+          ].map((row, rIdx) => (
+            <div key={rIdx} className="flex justify-center mb-2 gap-1">
+              {row.map((key) => (
+                <button
+                  key={key}
+                  onClick={() => onKeyPress(key)}
+                  className={`h-14 font-bold transition-all flex items-center justify-center text-white
                 ${key.length > 1 ? "px-4 text-xs bg-gray-500" : "flex-1 max-w-[40px] text-md"}
                 ${keyStatuses[key] || "bg-gray-400 hover:bg-gray-500"}`}
-              >
-                {key == "DEL" ? (
-                  <FontAwesomeIcon size="lg" icon={faBackspace} />
-                ) : (
-                  key
-                )}
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
+                >
+                  {key == "DEL" ? (
+                    <FontAwesomeIcon size="lg" icon={faBackspace} />
+                  ) : (
+                    key
+                  )}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </footer>
     </div>
   );
 }
