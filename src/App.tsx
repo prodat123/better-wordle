@@ -55,41 +55,27 @@ const LEVELS = [
   },
   {
     id: 3,
-    name: "Junior",
-    wordLength: 6,
-    baseRows: 6,
-    quirk: "Six letters, six tries. More combinations.",
-  },
-  {
-    id: 4,
     name: "Senior",
     wordLength: 6,
     baseRows: 5,
     quirk: "Longer words, fewer chances.",
   },
   {
-    id: 5,
+    id: 4,
     name: "Graduate",
     wordLength: 5,
     baseRows: 4,
     quirk: "Speed round: 5 letters, 4 tries.",
   },
   {
-    id: 6,
-    name: "Professor",
-    wordLength: 6,
-    baseRows: 4,
-    quirk: "Expert precision required.",
-  },
-  {
-    id: 7,
+    id: 5,
     name: "Dean",
     wordLength: 5,
     baseRows: 3,
     quirk: "The 'Triple Threat': Only 3 tries.",
   },
   {
-    id: 8,
+    id: 6,
     name: "Chancellor",
     wordLength: 6,
     baseRows: 3,
@@ -800,7 +786,7 @@ function App() {
   };
 
   return (
-    <div className="h-[100dvh] w-full bg-white dark:bg-gray-900 flex flex-col items-center overflow-hidden p-2">
+    <div className="flex flex-col items-center justify-center h-screen max-h-screen overflow-hidden bg-white dark:bg-gray-900">
       {toast && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] bg-gray-800 text-white px-4 py-2 font-bold shadow-xl animate-toast">
           {toast}
@@ -816,7 +802,7 @@ function App() {
 
         <div className="text-center mb-1">
           <span className="uppercase font-semibold dark:text-gray-400">
-            Round {levelIndex + 1} / 8
+            Round {levelIndex + 1} / 6
           </span>
         </div>
 
@@ -854,18 +840,23 @@ function App() {
         )}
       </header>
 
+      {solution}
+
       {inventory.DEFINITION && !gameOver && (
         <div className="max-w-sm mx-auto mb-4 p-3 bg-green-100 dark:bg-green-900/20 border border-green-200 text-sm italic dark:text-green-200 font-sans">
           <strong>Definition:</strong> {definition.replace(/^.\t/, "")}
         </div>
       )}
 
-      <main className="flex-1 w-full flex items-center justify-center min-h-0 overflow-hidden py-2">
+      <main className="flex-1 w-full flex items-center justify-center overflow-hidden min-h-0 py-2 px-4">
         <div
-          className="grid gap-1 w-full max-w-xs sm:max-w-sm mx-auto px-4"
+          className="grid gap-1 w-full mx-auto"
           style={{
             gridTemplateColumns: `repeat(${currentLevel.wordLength}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${totalRows}, minmax(0, 1fr))`,
+            maxWidth: `min(100%, ${totalRows * 7}vh)`,
+            /* Maintain the shape of the grid regardless of container size */
+            aspectRatio: `${currentLevel.wordLength} / ${totalRows}`,
           }}
         >
           {guesses.map((char, i) => {
@@ -874,8 +865,6 @@ function App() {
             const isPop = i === lastTypedIdx;
             const isShake = rowIdx === shakeRow;
             const isRevealing = animatingRow === rowIdx;
-
-            // NEW: Check if this row is currently receiving points
             const isPointRow = givingPoints.includes(rowIdx);
 
             return (
@@ -885,21 +874,19 @@ function App() {
                   animationDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
                   transitionDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
                 }}
-                className={`relative aspect-square border-2 flex items-center justify-center font-bold text-2xl dark:text-white text-black sm:text-4xl uppercase 
-        ${isPop ? "animate-pop" : ""}
-        ${isShake ? "animate-shake" : ""}
-        ${isRevealing ? "animate-flip reveal-color" : ""}
-        
-        /* Highlight row green if giving points, otherwise normal logic */
-        ${
-          isPointRow
-            ? "bg-green-500/20 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
-            : statuses[i] ||
-              (char
-                ? "border-black dark:border-white"
-                : "border-gray-300 dark:border-gray-600")
-        }
-      `}
+                className={`relative aspect-square border-2 flex items-center justify-center font-bold uppercase transition-all duration-500 sm:text-2xl
+            ${isPop ? "animate-pop" : ""}
+            ${isShake ? "animate-shake" : ""}
+            ${isRevealing ? "animate-flip reveal-color" : ""}
+            ${
+              isPointRow
+                ? "bg-green-500/20 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+                : statuses[i] ||
+                  (char
+                    ? "border-black dark:border-white"
+                    : "border-gray-300 dark:border-gray-600")
+            }
+          `}
               >
                 {char}
 
@@ -987,7 +974,7 @@ function App() {
       </main>
 
       <footer className="w-full max-w-xl shrink-0 pb-4">
-        <div className="max-w-xl w-full mx-auto mt-10 px-2">
+        <div className="max-w-xl w-full mx-auto px-2">
           {[
             ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
             ["A", "S", "D", "F", "G", "H", "J", "K", "L"],

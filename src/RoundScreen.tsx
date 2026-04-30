@@ -167,10 +167,10 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
                       />
                     </div>
                     <div className="text-left">
-                      <p className="font-bold dark:text-white text-sm">
+                      <p className="font-bold dark:text-white text-md">
                         {p.label}
                       </p>
-                      <p className="text-[11px] leading-tight text-gray-500 dark:text-gray-400">
+                      <p className="text-sm leading-tight text-gray-500 dark:text-gray-400">
                         {p.desc}
                       </p>
                     </div>
