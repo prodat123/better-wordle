@@ -786,7 +786,7 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen max-h-screen overflow-hidden bg-white dark:bg-gray-900">
+    <div className="flex flex-col items-center justify-center h-screen max-h-screen bg-white dark:bg-gray-900">
       {toast && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] bg-gray-800 text-white px-4 py-2 font-bold shadow-xl animate-toast">
           {toast}
@@ -839,8 +839,6 @@ function App() {
           </span>
         )}
       </header>
-
-      {solution}
 
       {inventory.DEFINITION && !gameOver && (
         <div className="max-w-sm mx-auto mb-4 p-3 bg-green-100 dark:bg-green-900/20 border border-green-200 text-sm italic dark:text-green-200 font-sans">
