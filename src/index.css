@@ -11,10 +11,6 @@ body{
   text-rendering: optimizeSpeed;
 
   font-style: normal;
-
-  overflow-y: hidden;
-  overflow-x: hidden;
-  overscroll-behavior: none;
 }
 
 img {

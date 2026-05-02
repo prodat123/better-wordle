@@ -846,7 +846,7 @@ function App() {
         </div>
       )}
 
-      <main className="flex-1 w-full flex items-center justify-center overflow-hidden min-h-0 py-2 px-4">
+      <main className="flex-1 w-full flex items-center justify-center overflow-hidden min-h-0 px-4">
         <div
           className="grid gap-1 w-full mx-auto"
           style={{
