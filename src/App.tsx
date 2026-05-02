@@ -874,7 +874,7 @@ function App() {
                   animationDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
                   transitionDelay: isRevealing ? `${colIdx * 400}ms` : "0ms",
                 }}
-                className={`relative aspect-square border-2 flex items-center justify-center font-bold uppercase transition-all duration-500 sm:text-2xl
+                className={`relative aspect-square text-black dark:text-white border-2 flex items-center justify-center font-bold uppercase transition-all duration-500 sm:text-4xl
             ${isPop ? "animate-pop" : ""}
             ${isShake ? "animate-shake" : ""}
             ${isRevealing ? "animate-flip reveal-color" : ""}
