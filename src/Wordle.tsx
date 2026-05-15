@@ -349,7 +349,7 @@ const shuffleLevels = <T,>(levels: T[]): T[] => {
   return [firstLevel, ...remainingLevels];
 };
 
-function App() {
+function Wordle() {
   const [activeLevels, setActiveLevels] = useState<Level[]>(() =>
     shuffleLevels(LEVELS),
   );
@@ -1002,4 +1002,4 @@ function App() {
   );
 }
 
-export default App;
+export default Wordle;

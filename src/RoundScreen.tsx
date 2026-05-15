@@ -9,6 +9,7 @@ import defImg from "./assets/definition_sprite.png";
 import multImg from "./assets/two_times_sprite.png";
 import flashbackImg from "./assets/flashback_sprite.png";
 import scholarImg from "./assets/scholar_sprite.png";
+import Leaderboard from "./Leaderboard";
 
 export type PowerUpType =
   | "HINT"
@@ -179,6 +180,8 @@ const RoundScreen: React.FC<RoundScreenProps> = ({
               </div>
             </div>
           )}
+
+          {!isWin && <Leaderboard />}
 
           <motion.button
             whileHover={selectedPowerUp || !isWin ? { scale: 1.02 } : {}}
